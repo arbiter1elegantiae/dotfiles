@@ -20,9 +20,7 @@
     status
     command_execution_time
     background_jobs
-    direnv
     virtualenv
-    anaconda
     kubecontext
     terraform
     aws
@@ -102,8 +100,6 @@
   typeset -g POWERLEVEL9K_VIRTUALENV_FOREGROUND=0
   typeset -g POWERLEVEL9K_VIRTUALENV_BACKGROUND=4
   typeset -g POWERLEVEL9K_VIRTUALENV_SHOW_PYTHON_VERSION=false
-  typeset -g POWERLEVEL9K_ANACONDA_FOREGROUND=0
-  typeset -g POWERLEVEL9K_ANACONDA_BACKGROUND=4
 
   # Infrastructure context. Kubernetes context is shown only for related commands.
   typeset -g POWERLEVEL9K_KUBECONTEXT_SHOW_ON_COMMAND='kubectl|helm|kubens|kubectx|oc|k9s|helmfile|flux|stern|kubeseal|skaffold'

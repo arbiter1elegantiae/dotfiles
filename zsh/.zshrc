@@ -82,8 +82,8 @@ bindkey -M vicmd '^[[B' down-line-or-beginning-search
 bindkey -M viins '^R' history-incremental-search-backward
 bindkey -M vicmd '^R' history-incremental-search-backward
 
-# Temporary Powerlevel10k configuration used while developing this setup.
-[[ -r "$HOME/.tmp-new-p10k.zsh" ]] && source "$HOME/.tmp-new-p10k.zsh"
+# Powerlevel10k configuration.
+[[ -r "$HOME/.p10k.zsh" ]] && source "$HOME/.p10k.zsh"
 
 # Must remain last so every ZLE widget is visible to the highlighter.
 source "${ZSH_CUSTOM:-$ZSH/custom}/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
