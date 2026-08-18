@@ -11,6 +11,7 @@ export PATH
 # Oh My Zsh
 export ZSH="${ZSH:-$HOME/.oh-my-zsh}"
 ZSH_THEME="powerlevel10k/powerlevel10k"
+zstyle ':omz:update' mode disabled
 
 # Oh My Zsh initializes compinit before loading these plugins.
 plugins=(
