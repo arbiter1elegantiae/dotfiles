@@ -209,8 +209,27 @@ install_user_tools() {
   link_file "$HOME/.opencode/bin/opencode" "$HOME/.local/bin/opencode"
 
   mkdir -p "$HOME/.config/opencode"
+  install_herdr_skill
   log "Installing the Herdr integration for OpenCode"
   "$mise_executable" exec -- herdr integration install opencode
+}
+
+install_herdr_skill() {
+  skill_directory=$HOME/.config/opencode/skills/herdr
+  temporary_skill=$(mktemp "${TMPDIR:-/tmp}/herdr-skill.XXXXXX")
+
+  if ! "$mise_executable" exec -- herdr --skill > "$temporary_skill"; then
+    rm -f "$temporary_skill"
+    die "failed to export the Herdr OpenCode skill"
+  fi
+  if [ ! -s "$temporary_skill" ]; then
+    rm -f "$temporary_skill"
+    die "Herdr returned an empty OpenCode skill"
+  fi
+
+  log "Installing the Herdr skill for OpenCode"
+  mkdir -p "$skill_directory"
+  mv "$temporary_skill" "$skill_directory/SKILL.md"
 }
 
 link_file() {

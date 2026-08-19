@@ -11,7 +11,8 @@ Run the bootstrap from this repository:
 ```
 
 It installs the base shell packages, pinned Zsh dependencies, mise, uv, Node.js
-LTS, Herdr, and OpenCode. It then creates these links:
+LTS, Herdr, and OpenCode. It also installs Herdr's bundled OpenCode skill at
+`~/.config/opencode/skills/herdr/SKILL.md`. It then creates these links:
 
 ```text
 zsh/.zshrc     -> ~/.zshrc
