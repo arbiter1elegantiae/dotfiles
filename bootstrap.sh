@@ -10,6 +10,9 @@ POWERLEVEL10K_REVISION=36f3045d69d1ba402db09d09eb12b42eebe0fa3b
 FZF_TAB_REVISION=d7e0234614dbe5369fdd760907d12c0e05a4dccc
 AUTOSUGGESTIONS_REVISION=e52ee8ca55bcc56a17c828767a3f98f22a68d4eb
 SYNTAX_HIGHLIGHTING_REVISION=db085e4661f6aafd24e5acb5b2e17e4dd5dddf3e
+NEOVIM_VERSION=0.12.4
+LUA_LANGUAGE_SERVER_VERSION=3.17.1
+STYLUA_VERSION=2.3.1
 
 log() {
   printf '==> %s\n' "$1"
@@ -81,7 +84,7 @@ install_system_packages() {
     Darwin)
       install_homebrew
       log "Installing macOS packages"
-      brew install git zsh fzf
+      brew install git zsh fzf ripgrep
       ;;
     Linux)
       [ -r /etc/os-release ] || die "unable to identify this Linux distribution"
@@ -93,11 +96,11 @@ install_system_packages() {
           log "Installing Debian/Ubuntu packages"
           run_as_root apt-get update
           run_as_root env DEBIAN_FRONTEND=noninteractive \
-            apt-get install -y ca-certificates curl fzf git tar unzip zsh
+            apt-get install -y ca-certificates curl fzf git ripgrep tar unzip wl-clipboard xclip zsh
           ;;
         fedora)
           log "Installing Fedora packages"
-          run_as_root dnf install -y ca-certificates curl fzf git tar unzip zsh
+          run_as_root dnf install -y ca-certificates curl fzf git ripgrep tar unzip wl-clipboard xclip zsh
           ;;
         *)
           die "unsupported Linux distribution: ${ID:-unknown}"
@@ -200,6 +203,11 @@ install_user_tools() {
     "$mise_executable" use --global herdr
   fi
 
+  log "Installing pinned Neovim tools with mise"
+  "$mise_executable" use --global "aqua:neovim/neovim@$NEOVIM_VERSION"
+  "$mise_executable" use --global "aqua:LuaLS/lua-language-server@$LUA_LANGUAGE_SERVER_VERSION"
+  "$mise_executable" use --global "aqua:JohnnyMorganz/StyLua@$STYLUA_VERSION"
+
   if [ ! -x "$HOME/.opencode/bin/opencode" ]; then
     log "Installing OpenCode"
     curl -fsSL https://opencode.ai/install | \
@@ -259,6 +267,7 @@ link_dotfiles() {
   link_file "$SCRIPT_DIR/zsh/.zprofile" "$HOME/.zprofile"
   link_file "$SCRIPT_DIR/zsh/.p10k.zsh" "$HOME/.p10k.zsh"
   link_file "$SCRIPT_DIR/ghostty/config" "$HOME/.config/ghostty/config"
+  link_file "$SCRIPT_DIR/nvim" "$HOME/.config/nvim"
 }
 
 if [ "$LINKS_ONLY" = false ]; then
