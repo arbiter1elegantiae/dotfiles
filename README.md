@@ -27,9 +27,11 @@ Existing target files are moved to timestamped backup files before linking.
 Installers are configured not to edit shell configuration files.
 Ghostty itself is not installed; the bootstrap only links its configuration.
 
-Neovim is a small, pinned configuration derived from
-[Kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim). Plugin revisions
-are tracked in `nvim/lazy-lock.json` and are not updated by bootstrap.
+Neovim uses the current Omarchy LazyVim configuration, including theme
+hot-reloading and remote clipboard support. Plugin revisions are tracked in
+`nvim/lazy-lock.json` and are not updated by bootstrap. Ghostty loads colors
+from Omarchy's current theme. `herdr/config.toml` is tracked but is not yet
+linked by bootstrap.
 
 OpenCode remains updater-owned at `~/.opencode/bin/opencode`. The bootstrap
 links that executable to `~/.local/bin/opencode`, backing up an existing target
