@@ -95,6 +95,27 @@ return {
 					end)
 				end,
 			})
+
+			-- The portable theme loader reads a file outside the config directory,
+			-- so Lazy's normal config watcher cannot detect Omarchy theme changes.
+			-- Poll the file itself to also handle Omarchy's atomic directory swaps.
+			local state_home = vim.env.XDG_STATE_HOME or vim.fn.expand("~/.local/state")
+			local theme_file = state_home .. "/omarchy/current/theme/neovim.lua"
+			local watcher = assert(vim.uv.new_fs_poll())
+			watcher:start(theme_file, 1000, vim.schedule_wrap(function(err)
+				-- The theme file is optional and may be absent outside Omarchy.
+				if err then
+					return
+				end
+				require("lazy.manage.reloader").reload({ { file = theme_file, what = "changed" } })
+			end))
+			vim.api.nvim_create_autocmd("VimLeavePre", {
+				once = true,
+				callback = function()
+					watcher:stop()
+					watcher:close()
+				end,
+			})
 		end,
 	},
 }
