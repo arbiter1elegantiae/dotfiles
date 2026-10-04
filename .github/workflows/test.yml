@@ -55,9 +55,9 @@ jobs:
             echo "XDG_CACHE_HOME=$test_home/.cache"
             echo "PATH=/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
           } >> "$GITHUB_ENV"
-      - name: Install smoke-test dependencies
+      - name: Prepare smoke-test dependencies
         run: |
-          brew install python
+          python3 -c 'import tomllib'
           brew install --cask ghostty
       - name: Run full bootstrap and smoke tests
         run: sh tests/smoke/run.sh

@@ -60,8 +60,8 @@ development:
   each with an empty home and an unprivileged user with sudo. The real bootstrap
   runs twice, without mocked installers or cached tool installations.
 - **macOS installation:** a fresh GitHub-hosted macOS 15 VM with an isolated,
-  empty test home. Homebrew and Apple's build tools come with the runner; the
-  workstation tools are installed by bootstrap.
+  empty test home. Homebrew, Python, and Apple's build tools come with the runner;
+  the workstation tools are installed by bootstrap.
 
 The installation checks exercise login-shell startup, Git aliases, Zsh plugins,
 history settings, tool executables and pinned versions, OpenCode's executable
