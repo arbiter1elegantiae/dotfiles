@@ -1,0 +1,63 @@
+name: Test dotfiles
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 6 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dotfiles-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'schedule' }}
+
+jobs:
+  checks:
+    name: Syntax and link tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install check dependencies
+        run: sudo apt-get update && sudo apt-get install -y shellcheck zsh neovim
+      - run: sh tests/check.sh
+
+  linux:
+    name: Bootstrap / ${{ matrix.image }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        image: ["ubuntu:24.04", "debian:13", "fedora:44"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build clean sandbox and run smoke tests
+        run: docker build --no-cache --progress=plain --build-arg BASE_IMAGE="${{ matrix.image }}" -f tests/smoke/Dockerfile .
+
+  macos:
+    name: Bootstrap / macOS
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare disposable test home
+        run: |
+          test_home=$(mktemp -d "$RUNNER_TEMP/dotfiles-home.XXXXXX")
+          {
+            echo "HOME=$test_home"
+            echo "XDG_CONFIG_HOME=$test_home/.config"
+            echo "XDG_DATA_HOME=$test_home/.local/share"
+            echo "XDG_STATE_HOME=$test_home/.local/state"
+            echo "XDG_CACHE_HOME=$test_home/.cache"
+            echo "PATH=/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+          } >> "$GITHUB_ENV"
+      - name: Prepare smoke-test dependencies
+        run: |
+          python3 -c 'import tomllib'
+          brew install --cask ghostty
+      - name: Run full bootstrap and smoke tests
+        run: sh tests/smoke/run.sh

@@ -2,11 +2,11 @@
 
 set -eu
 
-REPOSITORY=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd -P)
+REPOSITORY=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd -P)
 TEST_ROOT=$(mktemp -d "${TMPDIR:-/tmp}/dotfiles-test.XXXXXX")
 trap 'rm -rf "$TEST_ROOT"' EXIT HUP INT TERM
 
-export HOME=$TEST_ROOT/home
+export HOME="$TEST_ROOT/home"
 mkdir -p "$HOME"
 printf 'existing zsh configuration\n' > "$HOME/.zshrc"
 mkdir -p "$HOME/.config/nvim"
