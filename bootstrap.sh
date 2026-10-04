@@ -2,7 +2,7 @@
 
 set -eu
 
-SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
+SCRIPT_DIR=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)
 LINKS_ONLY=false
 
 OH_MY_ZSH_REVISION=b37dd49ca5bfe0d99b35607637152cb8cc8b29d7
@@ -13,6 +13,7 @@ SYNTAX_HIGHLIGHTING_REVISION=db085e4661f6aafd24e5acb5b2e17e4dd5dddf3e
 NEOVIM_VERSION=0.12.4
 LUA_LANGUAGE_SERVER_VERSION=3.17.1
 STYLUA_VERSION=2.3.1
+TREE_SITTER_VERSION=0.27.0
 
 log() {
   printf '==> %s\n' "$1"
@@ -96,11 +97,11 @@ install_system_packages() {
           log "Installing Debian/Ubuntu packages"
           run_as_root apt-get update
           run_as_root env DEBIAN_FRONTEND=noninteractive \
-            apt-get install -y ca-certificates curl fzf git ripgrep tar unzip wl-clipboard xclip zsh
+            apt-get install -y build-essential ca-certificates curl fzf git ripgrep tar unzip wl-clipboard xclip zsh
           ;;
         fedora)
           log "Installing Fedora packages"
-          run_as_root dnf install -y ca-certificates curl fzf git ripgrep tar unzip wl-clipboard xclip zsh
+          run_as_root dnf install -y ca-certificates curl fzf gcc gcc-c++ git make ripgrep tar unzip wl-clipboard xclip zsh
           ;;
         *)
           die "unsupported Linux distribution: ${ID:-unknown}"
@@ -207,6 +208,7 @@ install_user_tools() {
   "$mise_executable" use --global "aqua:neovim/neovim@$NEOVIM_VERSION"
   "$mise_executable" use --global "aqua:LuaLS/lua-language-server@$LUA_LANGUAGE_SERVER_VERSION"
   "$mise_executable" use --global "aqua:JohnnyMorganz/StyLua@$STYLUA_VERSION"
+  "$mise_executable" use --global "aqua:tree-sitter/tree-sitter@$TREE_SITTER_VERSION"
 
   if [ ! -x "$HOME/.opencode/bin/opencode" ]; then
     log "Installing OpenCode"
