@@ -1,0 +1,56 @@
+name: Documentation
+description: Specify a documentation addition, correction, or clarification.
+title: "docs: "
+labels: [documentation]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Keep this specification concise and current; edit relevant sections when
+        requirements change rather than appending an activity log.
+        Define the documentation outcome and intended audience. Implementation
+        starts after owner approval and a coordinated agent claim. Use
+        repository-relative paths and omit private workstation or session details.
+  - type: textarea
+    id: goal
+    attributes:
+      label: Documentation gap and audience
+      description: What is missing or incorrect, who is affected, and what should they understand afterward?
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope and non-goals
+      description: Describe the content to add or correct; identify any excluded implementation changes.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: List observable documentation outcomes as Markdown checkboxes.
+      placeholder: "- [ ] Instructions match the current implementation and intended workflow."
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification plan
+      description: Explain how paths, examples, links, or structured documents will be checked.
+    validations:
+      required: true
+  - type: textarea
+    id: affected-files
+    attributes:
+      label: Affected files or components
+      description: Identify documentation paths and any shared files.
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies and open questions
+      description: Link related issues or PRs and decisions needed before starting; write None if clear.
+    validations:
+      required: true

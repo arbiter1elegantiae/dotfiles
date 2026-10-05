@@ -2,6 +2,14 @@
 
 Portable workstation configurations for macOS, Ubuntu/Debian, and Fedora.
 
+## Contributing
+
+Start with a [feature, bug, or documentation issue](https://github.com/arbiter1elegantiae/dotfiles/issues/new/choose)
+and obtain owner approval of its specification before implementation. See
+[AGENTS.md](AGENTS.md) for commit conventions, agent claims, parallel worktrees,
+and sandbox verification. Issues are tracked through the owner's
+[`dotfiles` GitHub project board](https://github.com/users/arbiter1elegantiae/projects/3).
+
 ## Bootstrap
 
 Run the bootstrap from this repository:
