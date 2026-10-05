@@ -1,0 +1,70 @@
+name: Bug
+description: Capture a reproducible failure and define the expected fix.
+title: "fix: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Keep this specification concise and current; edit relevant sections when
+        requirements change rather than appending an activity log.
+        Include enough information to reproduce the failure. Implementation starts
+        after owner approval and a coordinated agent claim. Omit local paths and
+        private workstation or session details; sanitize any evidence before sharing.
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and actual behavior
+      description: Explain what should happen, what happens instead, and the impact.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps and evidence
+      description: Include reproducible commands, sanitized evidence, and whether the failure is intermittent.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Reproduction environment
+      description: Describe a reproducible sandbox, relevant tool versions, and repository revision; omit private workstation details.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Fix scope and non-goals
+      description: Bound the intended fix; distinguish confirmed facts from suspected causes.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: List observable outcomes as Markdown checkboxes.
+      placeholder: "- [ ] The reproduction now produces the expected behavior."
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification plan
+      description: Describe reproduction checks, appropriate regression coverage, and required sandboxes.
+    validations:
+      required: true
+  - type: textarea
+    id: affected-files
+    attributes:
+      label: Affected files or components
+      description: Identify likely paths and shared files, or state what needs investigation.
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies and open questions
+      description: Link related issues or PRs and decisions needed before starting; write None if clear.
+    validations:
+      required: true

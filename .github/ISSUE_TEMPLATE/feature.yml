@@ -1,0 +1,56 @@
+name: Feature
+description: Specify new behavior or an improvement before implementation.
+title: "feat: "
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Keep this specification concise and current; edit relevant sections when
+        requirements change rather than appending an activity log.
+        Implementation starts after owner approval and a coordinated agent claim;
+        submitting this form does not mark it ready. Use repository-relative paths
+        and omit private workstation or session details.
+  - type: textarea
+    id: goal
+    attributes:
+      label: Problem and desired outcome
+      description: What need does this address, and what should the user be able to do?
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope and non-goals
+      description: Describe the proposed behavior and explicitly exclude adjacent work.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: List observable outcomes as Markdown checkboxes.
+      placeholder: "- [ ] The requested behavior works on the intended platforms."
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification plan
+      description: Specify relevant checks, platforms, and any disposable sandbox needed.
+    validations:
+      required: true
+  - type: textarea
+    id: affected-files
+    attributes:
+      label: Affected files or components
+      description: Identify likely paths and shared files, or state what needs investigation.
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies and open questions
+      description: Link related issues or PRs and decisions needed before starting; write None if clear.
+    validations:
+      required: true
