@@ -21,13 +21,13 @@ to overwrite files. Read the tool README before installation.
 | Tool | Configuration | Installation status |
 | --- | --- | --- |
 | Zsh | [`zsh/`](zsh/README.md) | Optional installer; existing-system recommendations and agent-ready prompt. |
-| Ghostty | `ghostty/config` | Manual integration; installer/review pending. |
+| Ghostty | [`ghostty/config`](ghostty/README.md) | Configuration-only; install Ghostty separately and integrate manually. |
 | Neovim | `nvim/` | Manual integration; installer/review pending. |
 | Herdr | `herdr/config.toml` | Manual integration; installer/review pending. |
 
 The broader refactor is tracked in [Epic #7](https://github.com/arbiter1elegantiae/dotfiles/issues/7).
-Other tool files are retained unchanged during this transition, including their
-current Omarchy integrations; those will be reviewed separately.
+Neovim and Herdr files are retained unchanged during this transition, including
+their current Omarchy integrations; those will be reviewed separately.
 
 ## Optional bootstrap
 
@@ -39,8 +39,8 @@ sh zsh/install.sh
 
 The bootstrap is a thin sequential launcher, currently for **Zsh only**. It
 continues after existing-tool skips and stops on actual errors. Tool-specific
-logic belongs in each tool directory. More installers will be added after their
-individual reviews.
+logic belongs in each tool directory. Additional installers require individual
+review; Ghostty is intentionally configuration-only and is not part of bootstrap.
 
 This deliberately replaces the old monolithic bootstrap: no `--links-only`,
 unconditional configuration replacement, or automatic installation of mise, uv,
@@ -76,9 +76,10 @@ Linux checks install Zsh into an unprivileged empty test home, exercise plugins,
 prompt, history, completion, and aliases, then verify a repeat-run skip. macOS CI
 checks the normal existing-Zsh skip with a disposable home. Fast fixtures simulate
 the absent-Zsh Homebrew branch; they do not establish real absent-Zsh installation
-on macOS. CI also runs weekly to catch package-source drift. Other tool configs
-retain independent syntax/parsing checks; full editor/application installation
-tests are deferred until their installers are migrated.
+on macOS. CI also runs weekly to catch package-source drift. Neovim and Herdr
+retain independent syntax/parsing checks; their full installation tests remain
+deferred. For Ghostty's native configuration validation and manual appearance
+checks, see [its guide](ghostty/README.md#verification-and-recovery).
 
 ## Contributing
 
