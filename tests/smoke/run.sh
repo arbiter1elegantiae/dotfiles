@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-# Full installation tests are deliberately restricted to disposable CI systems.
+# Real package installation is restricted to disposable environments.
 case "$(uname -s)" in
   Linux)
     if [ ! -f /etc/dotfiles-test-sandbox ] || [ "$HOME" != /home/dotfiles ] || [ "$(id -u)" -eq 0 ]; then
@@ -16,7 +16,7 @@ case "$(uname -s)" in
     fi
     case "$HOME" in
       "$RUNNER_TEMP"/dotfiles-home.*) ;;
-      *) printf 'Expected a fresh test home under RUNNER_TEMP.\n' >&2; exit 1 ;;
+      *) printf 'Expected a disposable home under RUNNER_TEMP.\n' >&2; exit 1 ;;
     esac
     ;;
   *) exit 1 ;;
@@ -24,81 +24,76 @@ esac
 
 REPOSITORY=$(CDPATH='' cd -- "$(dirname -- "$0")/../.." && pwd -P)
 export DOTFILES_TEST_REPOSITORY="$REPOSITORY"
-export PATH="$HOME/.local/bin:$PATH"
 export TERM=xterm-256color
-# Avoid inheriting shell or runtime configuration from the runner.
 unset ZSH ZSH_CUSTOM ZDOTDIR TMUX SSH_TTY SSH_CONNECTION HERDR_PANE_ID
-unset WAYLAND_DISPLAY DISPLAY MISE_CONFIG_FILE MISE_DATA_DIR
-
-if [ -e "$HOME/.zshrc" ] || [ -e "$HOME/.local/bin/mise" ]; then
-  printf 'The sandbox home must be empty before bootstrap.\n' >&2
-  exit 1
-fi
-
-cp "$REPOSITORY/nvim/lazy-lock.json" "$HOME/expected-lazy-lock.json"
-printf '\n==> Full bootstrap in a clean home\n'
-"$REPOSITORY/bootstrap.sh"
-printf '\n==> Repeat bootstrap to check idempotency\n'
-"$REPOSITORY/bootstrap.sh"
-
-for target in .zshrc .zprofile .p10k.zsh .config/ghostty/config .config/nvim .local/bin/opencode; do
-  if [ ! -L "$HOME/$target" ] || [ ! -e "$HOME/$target" ]; then
-    printf 'Missing or broken installed link: %s\n' "$target" >&2
-    exit 1
-  fi
-done
-python3 - <<'PY'
-from pathlib import Path
-home = Path.home()
-backups = list(home.glob(".*.backup-*")) + list((home / ".config").glob("*.backup-*"))
-backups += list((home / ".local/bin").glob("*.backup-*"))
-assert not backups, f"Repeat bootstrap unexpectedly backed up installed files: {backups}"
-assert (home / ".config/opencode/skills/herdr/SKILL.md").stat().st_size > 0
-assert (home / ".local/bin/opencode").resolve() == home / ".opencode/bin/opencode"
-assert (home / "expected-lazy-lock.json").read_bytes() == (
-    home / ".config/nvim/lazy-lock.json"
-).read_bytes(), "Bootstrap modified the plugin lockfile"
-PY
-
-printf '\n==> Login shell, aliases, plugins, and installed tools\n'
-python3 "$REPOSITORY/tests/smoke/shell.py"
-
-printf '\n==> Validate tracked Herdr configuration\n'
-mise exec -- env HERDR_CONFIG_PATH="$REPOSITORY/herdr/config.toml" herdr config check
+unset MISE_CONFIG_FILE MISE_DATA_DIR
 
 if [ "$(uname -s)" = Darwin ]; then
-  printf '\n==> Validate Ghostty configuration\n'
-  /Applications/Ghostty.app/Contents/MacOS/ghostty +validate-config \
-    --config-file="$HOME/.config/ghostty/config"
+  # macOS supplies Zsh: this must skip, even with a completely empty test home.
+  output=$(sh "$REPOSITORY/bootstrap.sh")
+  printf '%s\n' "$output"
+  printf '%s\n' "$output" | grep -q 'SKIPPED: existing zsh'
+  [ -z "$(ls -A "$HOME")" ] || { printf 'Skip modified HOME\n' >&2; exit 1; }
+  for name in .zshrc .zprofile .p10k.zsh; do
+    /bin/zsh -n "$REPOSITORY/zsh/$name"
+  done
+  python3 "$REPOSITORY/tests/zsh-install.py"
+  exit 0
 fi
 
-printf '\n==> Neovim first startup and plugin installation\n'
-mise exec -- nvim --headless \
-  -c 'lua dofile(vim.env.DOTFILES_TEST_REPOSITORY .. "/tests/smoke/install-nvim.lua")'
-# Lazy rewrites its lockfile during incremental first-time installation. Restore
-# the repository snapshot before explicitly restoring the recorded revisions.
-# This copy is inside the disposable sandbox, never in the host checkout.
-cp "$HOME/expected-lazy-lock.json" "$REPOSITORY/nvim/lazy-lock.json"
-printf '\n==> Restore and check locked Neovim plugins\n'
-mise exec -- nvim --headless '+Lazy! restore' \
-  -c 'lua dofile(vim.env.DOTFILES_TEST_REPOSITORY .. "/tests/smoke/install-nvim.lua")'
-printf '\n==> Neovim editing, formatting, Git, LSP, themes, and clipboard\n'
-mkdir -p "$HOME/smoke-project"
-git -C "$HOME/smoke-project" init
-printf 'local value={1,2,3}\nreturn value\n' > "$HOME/smoke-project/example.lua"
-git -C "$HOME/smoke-project" add example.lua
-git -C "$HOME/smoke-project" -c user.name=Smoke -c user.email=smoke@example.invalid commit -m fixture
-mise exec -- nvim --headless -c 'lua dofile(vim.env.DOTFILES_TEST_REPOSITORY .. "/tests/smoke/nvim.lua")'
+[ -z "$(ls -A "$HOME")" ] || { printf 'Expected an empty test home\n' >&2; exit 1; }
+if command -v zsh >/dev/null 2>&1; then
+  printf 'The installation sandbox must not supply Zsh.\n' >&2
+  exit 1
+fi
+printf '==> Tool-absent Zsh installation\n'
+sh "$REPOSITORY/bootstrap.sh"
+for name in .zshrc .zprofile .p10k.zsh; do
+  [ "$(readlink "$HOME/$name")" = "$REPOSITORY/zsh/$name" ]
+done
+
+printf '==> Login shell, prompt, plugins, completion, history, and aliases\n'
+python3 "$REPOSITORY/tests/smoke/shell.py"
+
+printf '==> Verify the five dependency revisions\n'
 python3 - <<'PY'
-import json
 import os
 from pathlib import Path
-expected = json.loads((Path.home() / "expected-lazy-lock.json").read_text())
-actual = json.loads((Path(os.environ["DOTFILES_TEST_REPOSITORY"]) / "nvim/lazy-lock.json").read_text())
-# Lazy may normalize upstream branch names; the committed revisions must match.
-assert {name: entry["commit"] for name, entry in actual.items()} == {
-    name: entry["commit"] for name, entry in expected.items()
-}, "Neovim changed the recorded plugin revisions"
+import re
+import subprocess
+
+script = (Path(os.environ['DOTFILES_TEST_REPOSITORY']) / 'zsh/install.sh').read_text()
+pins = dict(re.findall(r'^([A-Z0-9_]+_REVISION)=([0-9a-f]{40})$', script, re.M))
+root = Path.home() / '.oh-my-zsh'
+paths = {
+    'OH_MY_ZSH_REVISION': root,
+    'POWERLEVEL10K_REVISION': root / 'custom/themes/powerlevel10k',
+    'FZF_TAB_REVISION': root / 'custom/plugins/fzf-tab',
+    'AUTOSUGGESTIONS_REVISION': root / 'custom/plugins/zsh-autosuggestions',
+    'SYNTAX_HIGHLIGHTING_REVISION': root / 'custom/plugins/zsh-syntax-highlighting',
+}
+assert len(pins) == len(paths) == 5
+for name, path in paths.items():
+    actual = subprocess.check_output(['git', '-C', str(path), 'rev-parse', 'HEAD'], text=True).strip()
+    assert actual == pins[name], f'Wrong revision: {name}'
 PY
 
-printf '\nAll bootstrap smoke tests passed.\n'
+printf '==> Repeat installation skips without touching HOME\n'
+python3 - <<'PY'
+import os
+from pathlib import Path
+import subprocess
+
+home = Path.home()
+def snapshot():
+    return {str(p.relative_to(home)): (p.lstat().st_mtime_ns, p.lstat().st_size,
+            os.readlink(p) if p.is_symlink() else None) for p in home.rglob('*')}
+before = snapshot()
+result = subprocess.run(['sh', os.environ['DOTFILES_TEST_REPOSITORY'] + '/bootstrap.sh'],
+                        capture_output=True, text=True, check=True)
+print(result.stdout)
+assert 'SKIPPED: existing zsh' in result.stdout
+assert snapshot() == before, 'Repeat installer changed HOME'
+assert not list(home.glob('.dotfiles-zsh.*')), 'Staging directory leaked'
+PY
+printf 'Zsh installation smoke tests passed.\n'
