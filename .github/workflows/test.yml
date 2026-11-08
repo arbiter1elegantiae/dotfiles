@@ -1,7 +1,6 @@
 name: Test dotfiles
 
 on:
-  push:
   pull_request:
   workflow_dispatch:
   schedule:
@@ -16,7 +15,7 @@ concurrency:
 
 jobs:
   checks:
-    name: Syntax and link tests
+    name: Syntax and installer contract tests
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
@@ -26,20 +25,20 @@ jobs:
       - run: sh tests/check.sh
 
   linux:
-    name: Bootstrap / ${{ matrix.image }}
+    name: Zsh installation / ${{ matrix.image }}
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        image: ["ubuntu:24.04", "debian:13", "fedora:44"]
+        image: ["ubuntu:24.04", "fedora:44", "archlinux:base"]
     steps:
       - uses: actions/checkout@v4
       - name: Build clean sandbox and run smoke tests
         run: docker build --no-cache --progress=plain --build-arg BASE_IMAGE="${{ matrix.image }}" -f tests/smoke/Dockerfile .
 
   macos:
-    name: Bootstrap / macOS
+    name: Existing Zsh / macOS
     runs-on: macos-15
     timeout-minutes: 30
     steps:
@@ -55,9 +54,5 @@ jobs:
             echo "XDG_CACHE_HOME=$test_home/.cache"
             echo "PATH=/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
           } >> "$GITHUB_ENV"
-      - name: Prepare smoke-test dependencies
-        run: |
-          python3 -c 'import tomllib'
-          brew install --cask ghostty
-      - name: Run full bootstrap and smoke tests
+      - name: Check existing-Zsh skip and portable shell configuration
         run: sh tests/smoke/run.sh

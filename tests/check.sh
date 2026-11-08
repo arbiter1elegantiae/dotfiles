@@ -4,7 +4,7 @@ set -eu
 REPOSITORY=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd -P)
 cd "$REPOSITORY"
 
-shellcheck bootstrap.sh tests/*.sh tests/smoke/*.sh
+shellcheck bootstrap.sh zsh/install.sh tests/*.sh tests/smoke/*.sh
 for config in zsh/.zshrc zsh/.zprofile zsh/.p10k.zsh tests/smoke/zsh.zsh; do
   zsh -n "$config"
 done
