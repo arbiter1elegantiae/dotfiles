@@ -22,6 +22,7 @@ to overwrite files. Read the tool README before installation.
 | --- | --- | --- |
 | Zsh | [`zsh/`](zsh/README.md) | Optional installer; existing-system recommendations and agent-ready prompt. |
 | Ghostty | [`ghostty/config`](ghostty/README.md) | Configuration-only; install Ghostty separately and integrate manually. |
+| Git | [`git/aliases.gitconfig`](git/README.md) | Shared Git aliases; manual installation and updates. |
 | Neovim | `nvim/` | Manual integration; installer/review pending. |
 | Herdr | `herdr/config.toml` | Manual integration; installer/review pending. |
 
