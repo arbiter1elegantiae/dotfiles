@@ -1,58 +1,60 @@
+# Skip first-run setup.
 onboarding = false
-# Mirrors the Omarchy tmux config in config/tmux/tmux.conf
-# tmux session -> herdr workspace, tmux window -> herdr tab, tmux pane -> herdr pane
 
 [theme]
-# tmux ran on the terminal's own palette (bg=default, fg=default, ANSI blue accents)
+# Follow the host terminal's color palette.
 name = "terminal"
 
 [theme.custom]
-# The active tab is drawn as panel_bg text on an accent background, so panel_bg
-# has to be dark for it to read - same colors as status-left's "#[fg=black,bg=blue]"
+# Keep active-tab text dark for contrast against its accent background.
 panel_bg = "black"
-# The terminal theme leaves Navigate-mode selection at the terminal background,
-# making prefix+w's selected workspace invisible; give it a distinct highlight.
+# Give the selected sidebar row a distinct highlight in Navigate mode.
 selection_bg = "#2d3650"
 
 [terminal]
-# Matches -c "#{pane_current_path}" on every split, window, and session
+# New panes, tabs, and workspaces inherit the source working directory.
 new_cwd = "follow"
 
 [keys]
+# prefix+... means press Ctrl+B, then the indicated key combination.
 prefix = "ctrl+b"
 
-# Config and help
+# Reload settings, show keybindings, or detach while panes keep running.
 reload_config = "prefix+q"
 help = "prefix+?"
 detach = "prefix+d"
 
-# Copy mode
+# Enter copy mode to select and copy pane output.
 copy_mode = "prefix+["
 
-# Panes
+# Split horizontally (stacked) or vertically (side by side).
 split_horizontal = ["prefix+h", "alt+enter"]
 split_vertical = ["prefix+v", "alt+shift+enter"]
+
+# Close or zoom the focused pane, or return to the last focused pane.
 close_pane = ["prefix+x", "alt+esc"]
 zoom = "prefix+z"
 last_pane = "prefix+;"
 
+# Move focus directly between panes.
 focus_pane_left = "ctrl+alt+left"
 focus_pane_down = "ctrl+alt+down"
 focus_pane_up = "ctrl+alt+up"
 focus_pane_right = "ctrl+alt+right"
 
+# Enter resize mode with the prefix followed by Ctrl+an arrow key.
 resize_mode = ["prefix+ctrl+left", "prefix+ctrl+down", "prefix+ctrl+up", "prefix+ctrl+right"]
 
-# Like resize-pane on C-M-S-arrows
+# Resize the focused pane directly, without entering resize mode.
 resize_pane_left = "ctrl+alt+shift+left"
 resize_pane_down = "ctrl+alt+shift+down"
 resize_pane_up = "ctrl+alt+shift+up"
 resize_pane_right = "ctrl+alt+shift+right"
 
-# No tmux equivalent; herdr's default prefix+shift+p is taken by previous session
+# Rename the focused pane.
 rename_pane = "prefix+shift+o"
 
-# Windows -> tabs
+# Create, rename, close, or select tabs in the current workspace.
 new_tab = "prefix+c"
 rename_tab = "prefix+r"
 close_tab = "prefix+k"
@@ -60,11 +62,11 @@ switch_tab = ["prefix+1..9", "alt+1..9"]
 previous_tab = ["prefix+p", "alt+left"]
 next_tab = ["prefix+n", "alt+right"]
 
-# Like swap-window -t -1/+1 on M-S-Left/Right
+# Move the current tab earlier or later in the tab order.
 move_tab_previous = "alt+shift+left"
 move_tab_next = "alt+shift+right"
 
-# Sessions -> workspaces
+# Create, rename, close, or cycle through workspaces.
 new_workspace = "prefix+shift+c"
 rename_workspace = "prefix+shift+r"
 close_workspace = "prefix+shift+k"
@@ -72,28 +74,24 @@ previous_workspace = ["prefix+shift+p", "alt+up"]
 next_workspace = ["prefix+shift+n", "alt+down"]
 
 [ui]
+# Use blue accents for UI highlights.
 accent = "blue"
 
-# tmux drew single-line dividers between adjacent panes and no outer frame
+# Share dividers between adjacent panes without an outer frame.
 pane_gaps = false
 pane_outer_borders = false
 
-# tmux had no scrollbar column beside its panes
+# Hide pane scrollbars to leave more columns for terminal content.
 pane_scrollbars = false
 
-# kill-window and kill-session never asked
-confirm_close = false
-
-# automatic-rename gave windows a name without prompting
+# Create tabs without prompting for a name.
 prompt_new_tab_name = false
 
-# set -g mouse on
+# Let Herdr handle mouse input for its interface.
 mouse_capture = true
 
-# status-right had the zoom flag followed by #h
+# Show the zoom indicator and server hostname at the right of the tab bar.
 tab_bar_right = [{ type = "zoom" }, { type = "hostname" }]
 
-# set -g set-titles on / set -g set-titles-string '#h:#W', where tmux's #W was
-# the basename of the pane cwd. This is what Hyprland shows in the group bar,
-# and it resolves on the server so remote sessions name the remote host.
+# Set the outer terminal title to the server hostname and current workspace.
 window_title = "{hostname}: {workspace}"

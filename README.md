@@ -24,11 +24,11 @@ to overwrite files. Read the tool README before installation.
 | Ghostty | [`ghostty/config`](ghostty/README.md) | Configuration-only; install Ghostty separately and integrate manually. |
 | Git | [`git/aliases.gitconfig`](git/README.md) | Shared Git aliases; manual installation and updates. |
 | Neovim | `nvim/` | Manual integration; installer/review pending. |
-| Herdr | `herdr/config.toml` | Manual integration; installer/review pending. |
+| Herdr | [`herdr/config.toml`](herdr/README.md) | Herdr TUI configuration; installation and replacement guide. |
 
 The broader refactor is tracked in [Epic #7](https://github.com/arbiter1elegantiae/dotfiles/issues/7).
-Neovim and Herdr files are retained unchanged during this transition, including
-their current Omarchy integrations; those will be reviewed separately.
+Neovim files are retained unchanged during this transition, including their
+current Omarchy integrations; those will be reviewed separately.
 
 ## Optional bootstrap
 
