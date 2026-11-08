@@ -31,6 +31,8 @@ provides scheduling and visibility.
 7. Leave review and merge to the owner unless explicitly authorized otherwise.
    An implementation is ready for review when its acceptance criteria and
    relevant checks pass; the issue is complete after the change is merged.
+8. When informed that a PR was merged, perform the post-merge reconciliation
+   below before moving on to the next task.
 
 ## Writing issues and PRs
 
@@ -108,6 +110,32 @@ The CLI's `read:project` scope permits inspection; project mutations require
 `project` scope. If writes are unavailable, report the intended board update on
 the issue and to the owner; issue work can continue independently. Do not change
 authentication or token scopes without the owner's request.
+
+## Post-merge reconciliation
+
+The owner may merge while no agent is running. GitHub issue-closing keywords do
+not remove coordination labels or update an epic's written checklist. On learning
+of a merge, the responding agent (or designated coordinator) is responsible for
+checking the current GitHub state and completing any missing updates:
+
+1. Confirm the PR is merged and identify its linked issues. For work it actually
+   completes, verify the acceptance criteria and issue closure. If closure is
+   needed, use the `completed` state reason. A `Refs` link or a merged partial
+   implementation alone is not grounds to close an issue.
+2. Remove `agent:ready`, `agent:claimed`, and `agent:blocked` from completed,
+   closed issues, preserving primary type labels and unrelated metadata.
+3. Verify those issues are `Done` on the project board, following the field and
+   membership inspection rules above before any mutation.
+4. Update the corresponding task entries in parent epics to reflect completed
+   sub-issues. Do not mark the whole epic complete or check broader acceptance
+   criteria without verifying them separately.
+5. Report the reconciled state and any remaining blockers to the owner. Record
+   actionable permission blockers on the relevant issue, not routine activity
+   logs; do not change authentication or permissions to make an update succeed.
+
+Reconciliation is repeatable: re-read state and change only what is missing.
+These instructions require an agent to act; they do not create an automatic
+merge callback or authorize branch/worktree cleanup or publication.
 
 ## Concurrent agents: claims, worktrees, and sandboxes
 
